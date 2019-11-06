@@ -38,9 +38,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
         this.ctx = new WeakReference<>(ctx);
     }
 
-    // TODO 01. We modify the progress dialog to trigger AsyncTask's cancel method when the
-    //  dialog itself is cancelled
-
     @Override
     protected void onPreExecute() {
         if ( ctx != null && ctx.get()!= null ) {
@@ -50,9 +47,7 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
             progressDialog.setProgress(0);
             progressDialog.setMax(100);
             progressDialog.setIndeterminate(false);
-            // TODO 01.01. Now the dialog is cancellable
             progressDialog.setCancelable(true);
-            // TODO 01.02. We set a listener to detect cancellation events and trigger the cancellation of the AsyncTask
             // The boolean parameter allows us to specify whether an AsyncTask thread is in a
             // 'interruptible' state, may actually be interrupted or not.
             progressDialog.setOnCancelListener(new DialogInterface.OnCancelListener() {
@@ -70,7 +65,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
         progressDialog.setProgress(values[0]);
     }
 
-    // TODO 02. We need to check for the cancellation in doInBackground
     // Retrieves the image from a URL
     private Bitmap downloadBitmap(URL url) {
         Bitmap bitmap =null;
@@ -102,7 +96,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
                 public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
                     int readBytes = super.read(buffer, byteOffset, byteCount);
 
-                    // TODO 02.01. Verify if the download was cancelled and return -1.
                     if ( isCancelled() ){
                         // Returning -1 means that there is no more data because the
                         // end of the stream has been reached.
@@ -121,8 +114,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
                 }
             };
             Bitmap downloaded = BitmapFactory.decodeStream(bif);
-            // TODO 02.02. We have to make sure that we only create the Bitmap if the operation
-            //  wasn't cancelled. Otherwise it will be null
             if ( !isCancelled() ){
                 bitmap = downloaded;
             }
@@ -140,19 +131,12 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
         return bitmap;
     }
 
-    // TODO 03. We override the onCancelled callback method.
-    //  This method is called instead of the onPostExecute callback, when the background task is finished because it has been cancelled.
-
     @Override
     protected void onCancelled() {
-        // TODO 03.01. We show a default image in the image view of our layout
         if ( imageViewRef !=null && imageViewRef.get() != null && ctx !=null && ctx.get() != null ) {
-            // TODO 03.02. Load the Bitmap from the application resources
             Bitmap bitmap = BitmapFactory.decodeResource(ctx.get().getResources(), R.drawable.default_photo);
-            // TODO 03.03. Set the image bitmap on the image view
             this.imageViewRef.get().setImageBitmap(bitmap);
         }
-        // TODO 03.04. Remove the dialog from the screen
         progressDialog.dismiss();
     }
 
