@@ -29,7 +29,8 @@ public class MainActivity extends AppCompatActivity {
                     // ImageView element used to display the downloaded image
                     ImageView iv = findViewById(
                             R.id.downloadedImage);
-                    photoAsyncTask = new DownloadImageTask(iv)
+                    // TODO 09. Pass the context to the constructor of the AsyncTask
+                    photoAsyncTask = new DownloadImageTask(MainActivity.this, iv)
                             .execute(url);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();

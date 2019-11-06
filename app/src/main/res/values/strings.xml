@@ -1,3 +1,4 @@
 <resources>
     <string name="app_name">AsynchronousProgramming</string>
+    <string name="downloading_image">Downloading Image</string>
 </resources>

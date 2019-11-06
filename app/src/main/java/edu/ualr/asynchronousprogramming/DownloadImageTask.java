@@ -1,5 +1,7 @@
 package edu.ualr.asynchronousprogramming;
 
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.os.AsyncTask;
@@ -25,8 +27,34 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
     // where the view was created is no longer active.
     private final WeakReference<ImageView> imageViewRef;
 
-    public DownloadImageTask(ImageView imageView) {
+    // TODO 01. We add a weak reference to the context
+    private final WeakReference<Context> ctx;
+
+    // TODO 03. We define a new ProgressDialog member. It's used to provide the user with information
+    //  about the progress of the background
+    private ProgressDialog progressDialog;
+
+    // TODO 02. We initialize the context reference in the constructor
+    public DownloadImageTask(Context ctx, ImageView imageView) {
         this.imageViewRef = new WeakReference<>(imageView);
+        this.ctx = new WeakReference<>(ctx);
+    }
+
+    // TODO 04. We override the onPreExecute method to define the actions to be executed before the
+    //  background thread starts
+    @Override
+    protected void onPreExecute() {
+        if ( ctx != null && ctx.get()!= null ) {
+            // TODO 05. We create a new ProgressDialog instance
+            // TODO 06. We initialize the progress dialog.
+            // TODO 06.01. Make the progress dialog noncancelable and indeterminate
+            // TODO 07. Show the progress dialog
+            progressDialog = new ProgressDialog(ctx.get());
+            progressDialog.setTitle(R.string.downloading_image);
+            progressDialog.setIndeterminate(true);
+            progressDialog.setCancelable(false);
+            progressDialog.show();
+        }
     }
 
     // Retrieves the image from a URL
@@ -89,6 +117,8 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
+        // TODO 08. Hide the progress dialog once the background work is finished
+        if ( progressDialog != null ) { progressDialog.dismiss(); }
         ImageView imageView = this.imageViewRef.get();
         if (imageView != null) {
             imageView.setImageBitmap(bitmap);
