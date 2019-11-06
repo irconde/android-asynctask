@@ -29,7 +29,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
     private final WeakReference<Context> ctx;
     private ProgressDialog progressDialog;
 
-    // TODO 05. We define two additional members to keep downloaded info bytes count
     int downloadedBytes = 0;
     int totalBytes = 0;
 
@@ -38,11 +37,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
         this.ctx = new WeakReference<>(ctx);
     }
 
-    // TODO 01. We have to change the settings of the progress dialog
-    // TODO 01.01. Initial value of progress is 0
-    // TODO 01.02. Maximum value of progress is 100
-    // TODO 01.03. Set as determinate
-    // TODO 01.04. Set the style of the dialog to STYLE_HORIZONTAL
     @Override
     protected void onPreExecute() {
         if ( ctx != null && ctx.get()!= null ) {
@@ -57,15 +51,11 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
         }
     }
 
-    // TODO 02. We override the onProgressUpdate method.
     @Override
     protected void onProgressUpdate(Integer... values) {
-        // TODO 03. We'll update the progress bar from the main thread
         progressDialog.setProgress(values[0]);
     }
 
-    // TODO 04. We modify the downloadBitmap method to calculate the progress at each iteration
-    //  of the for loop
     // Retrieves the image from a URL
     private Bitmap downloadBitmap(URL url) {
         Bitmap bitmap =null;
@@ -86,14 +76,12 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
                 throw new Exception("Unsuccessful Result code");
             }
 
-            // TODO 06. We initialize progress information
             totalBytes = conn.getContentLength();
             downloadedBytes = 0;
 
             is = conn.getInputStream();
             BufferedInputStream bif = new BufferedInputStream(is) {
 
-                // TODO 07. We define and initialize a variable to keep track of the progress
                 int progress = 0;
 
                 public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
@@ -104,12 +92,9 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
                         return -1;
                     }
                     if (readBytes > 0) {
-                        // TODO 09. Update actual number of bytes read from the file
                         downloadedBytes += readBytes;
                         // int percent = (int) ((((float) downloadedBytes) / ((float) totalBytes)) * 100);
-                        // TODO 10. Update the percent of work done
                         int percent = (int) ((downloadedBytes * 100f) / totalBytes);
-                        // TODO 11. Publish the progress to the main thread
                         if (percent > progress) {
                             publishProgress(percent);
                             progress = percent;
