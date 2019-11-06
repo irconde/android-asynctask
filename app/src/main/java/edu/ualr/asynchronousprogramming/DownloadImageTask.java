@@ -19,7 +19,6 @@ import java.net.URL;
 /**
  * Created by irconde on 2019-11-05.
  */
-// TODO 02. Modify the AsyncTask class definition. We'll have a result of type Result<Bitmap> instead of Bitmap
 // We have to specify the three type parameters that exposes the AsyncTask class
     // Params. Type of the value we pass to doInBackground. URL
     // Progress. Type of the value returned to the main thread while the background thread is running. Integer
@@ -68,8 +67,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Result<Bitmap>> {
     }
 
     // Retrieves the image from a URL
-    // TODO 08. We have to modify the downloadBitmap method and make it propagate caught exceptions
-    // TODO 08. Modify the method's signature
     private Bitmap downloadBitmap(URL url) throws Exception{
         Bitmap bitmap =null;
         InputStream is = null;
@@ -139,7 +136,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Result<Bitmap>> {
     @Override
     protected void onCancelled() {
         if ( imageViewRef !=null && imageViewRef.get() != null && ctx !=null && ctx.get() != null ) {
-            // TODO 06.02. Replace these two lines with the method invocation
             loadDefaultImage(this.imageViewRef.get());
         }
         progressDialog.dismiss();
@@ -148,9 +144,7 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Result<Bitmap>> {
     // TODO 03. Modify the type of the return value of the doInBackground method
     @Override
     protected Result<Bitmap> doInBackground(URL... urls) {
-        // TODO 04. Create a new instance of the Result class
         Result<Bitmap> result = new Result<>();
-        // TODO 05. We protect this block using try/catch
         try {
             URL url = urls[0];
             // The IO operation invoked will take a significant ammount
@@ -170,10 +164,8 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Result<Bitmap>> {
         if( progressDialog!=null ) { progressDialog.dismiss(); }
         ImageView imageView = this.imageViewRef.get();
         if (imageView != null) {
-            // TODO 05. If an exception was captured we'll show an error message in the logcat and load the default image
             if (result.error != null) {
                 Log.e("SafeDownloadImageTask", "Failed to download image ", result.error);
-                // TODO 06. Since we need to load a default image in several points of the code we'll define a new method: loadDefaultImage
                 loadDefaultImage(imageView);
             } else {
                 imageView.setImageBitmap(result.result);

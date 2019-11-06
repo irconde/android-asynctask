@@ -12,9 +12,6 @@ import android.widget.ImageView;
 import java.net.MalformedURLException;
 import java.net.URL;
 
-// TODO 01. Create a generic class for storing the result of a background operation and also a
-//  member to store an exception. Result
-
 // Why do we have to do this?
 // 1. Callback methods defined by AsyncTask don't throw exceptions. We must use try/catch blocks instead
 // 2. We'll want to catch the exception and directly update the user interface to alert the user.
