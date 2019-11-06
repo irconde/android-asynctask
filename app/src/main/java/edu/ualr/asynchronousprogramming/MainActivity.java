@@ -31,7 +31,6 @@ public class MainActivity extends AppCompatActivity {
                     // ImageView element used to display the downloaded image
                     ImageView iv = findViewById(R.id.downloadedImage);
                     photoAsyncTask = new DownloadImageTask(MainActivity.this, iv).execute(url);
-                    // TODO 01. Add a new method so we can get the status of the background task using the getStatus method
                     logAsyncTaskStatus(photoAsyncTask);
                 } catch (MalformedURLException e) {
                     e.printStackTrace();
@@ -41,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
 
     }
 
-    // TODO 01. Method definition
     private void logAsyncTaskStatus(AsyncTask task) {
         switch (task.getStatus()) {
             case PENDING:
@@ -64,7 +62,6 @@ public class MainActivity extends AppCompatActivity {
     @Override
     protected void onDestroy() {
         super.onDestroy();
-        // TODO 02. Cancel Pending Tasks when the activity is destroyed
         if(photoAsyncTask !=null && photoAsyncTask.getStatus()!=AsyncTask.Status.FINISHED){
             photoAsyncTask.cancel(true);
         }
