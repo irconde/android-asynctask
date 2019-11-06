@@ -13,7 +13,6 @@ import java.net.URL;
 
 public class MainActivity extends AppCompatActivity {
 
-    // TODO 06. Define am AsyncTask member
     AsyncTask photoAsyncTask = null;
 
     @Override
@@ -27,9 +26,7 @@ public class MainActivity extends AppCompatActivity {
                 try {
                     URL url = new URL("http://media.mydogspace.com.s3.amazonaws.com/wp-content" +
                             "/uploads/2013/08/puppy-500x350.jpg");
-                    // TODO 07. We create a new instance of the AsyncTask, providing a reference to the
                     // ImageView element used to display the downloaded image
-                    // TODO 08. We execute the AsyncTask providing as input parameter the URL of the image
                     ImageView iv = findViewById(
                             R.id.downloadedImage);
                     photoAsyncTask = new DownloadImageTask(iv)
