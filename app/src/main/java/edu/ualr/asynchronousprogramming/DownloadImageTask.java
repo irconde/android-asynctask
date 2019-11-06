@@ -26,37 +26,46 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
     // The WeakReference does not prevent the view from being garbage collected when the activity
     // where the view was created is no longer active.
     private final WeakReference<ImageView> imageViewRef;
-
-    // TODO 01. We add a weak reference to the context
     private final WeakReference<Context> ctx;
-
-    // TODO 03. We define a new ProgressDialog member. It's used to provide the user with information
-    //  about the progress of the background
     private ProgressDialog progressDialog;
 
-    // TODO 02. We initialize the context reference in the constructor
+    // TODO 05. We define two additional members to keep downloaded info bytes count
+    int downloadedBytes = 0;
+    int totalBytes = 0;
+
     public DownloadImageTask(Context ctx, ImageView imageView) {
         this.imageViewRef = new WeakReference<>(imageView);
         this.ctx = new WeakReference<>(ctx);
     }
 
-    // TODO 04. We override the onPreExecute method to define the actions to be executed before the
-    //  background thread starts
+    // TODO 01. We have to change the settings of the progress dialog
+    // TODO 01.01. Initial value of progress is 0
+    // TODO 01.02. Maximum value of progress is 100
+    // TODO 01.03. Set as determinate
+    // TODO 01.04. Set the style of the dialog to STYLE_HORIZONTAL
     @Override
     protected void onPreExecute() {
         if ( ctx != null && ctx.get()!= null ) {
-            // TODO 05. We create a new ProgressDialog instance
-            // TODO 06. We initialize the progress dialog.
-            // TODO 06.01. Make the progress dialog noncancelable and indeterminate
-            // TODO 07. Show the progress dialog
             progressDialog = new ProgressDialog(ctx.get());
             progressDialog.setTitle(R.string.downloading_image);
-            progressDialog.setIndeterminate(true);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.setProgress(0);
+            progressDialog.setMax(100);
+            progressDialog.setIndeterminate(false);
             progressDialog.setCancelable(false);
             progressDialog.show();
         }
     }
 
+    // TODO 02. We override the onProgressUpdate method.
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        // TODO 03. We'll update the progress bar from the main thread
+        progressDialog.setProgress(values[0]);
+    }
+
+    // TODO 04. We modify the downloadBitmap method to calculate the progress at each iteration
+    //  of the for loop
     // Retrieves the image from a URL
     private Bitmap downloadBitmap(URL url) {
         Bitmap bitmap =null;
@@ -73,18 +82,38 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
             // Starts the query
             conn.connect();
             int responseCode = conn.getResponseCode();
-
             if (responseCode != HttpURLConnection.HTTP_OK){
                 throw new Exception("Unsucesfull Result code");
             }
+
+            // TODO 06. We initialize progress information
+            totalBytes = conn.getContentLength();
+            downloadedBytes = 0;
+
             is = conn.getInputStream();
             BufferedInputStream bif = new BufferedInputStream(is) {
+
+                // TODO 07. We define and initialize a variable to keep track of the progress
+                int progress = 0;
+
                 public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
                     int readBytes = super.read(buffer, byteOffset, byteCount);
                     if ( isCancelled() ){
                         // Returning -1 means that there is no more data because the
                         // end of the stream has been reached.
                         return -1;
+                    }
+                    if (readBytes > 0) {
+                        // TODO 09. Update actual number of bytes read from the file
+                        downloadedBytes += readBytes;
+                        // int percent = (int) ((((float) downloadedBytes) / ((float) totalBytes)) * 100);
+                        // TODO 10. Update the percent of work done
+                        int percent = (int) ((downloadedBytes * 100f) / totalBytes);
+                        // TODO 11. Publish the progress to the main thread
+                        if (percent > progress) {
+                            publishProgress(percent);
+                            progress = percent;
+                        }
                     }
                     return readBytes;
                 }
@@ -107,6 +136,7 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
         return bitmap;
     }
 
+
     @Override
     protected Bitmap doInBackground(URL... urls) {
         URL url = urls[0];
@@ -117,7 +147,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
 
     @Override
     protected void onPostExecute(Bitmap bitmap) {
-        // TODO 08. Hide the progress dialog once the background work is finished
         if ( progressDialog != null ) { progressDialog.dismiss(); }
         ImageView imageView = this.imageViewRef.get();
         if (imageView != null) {
