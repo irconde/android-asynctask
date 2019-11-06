@@ -1,0 +1,154 @@
+package edu.ualr.asynchronousprogramming;
+
+import android.app.ProgressDialog;
+import android.content.Context;
+import android.content.DialogInterface;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.os.AsyncTask;
+import android.widget.ImageView;
+
+import java.io.BufferedInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.lang.ref.WeakReference;
+import java.net.HttpURLConnection;
+import java.net.URL;
+
+/**
+ * Created by irconde on 2019-11-05.
+ */
+// We have to specify the three type parameters that exposes the AsyncTask class
+    // Params. Type of the value we pass to doInBackground. URL
+    // Progress. Type of the value returned to the main thread while the background thread is running. Integer
+    // Result. Type of the value returned by the AsyncTask. Bitmap
+public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
+
+    // The WeakReference does not prevent the view from being garbage collected when the activity
+    // where the view was created is no longer active.
+    private final WeakReference<ImageView> imageViewRef;
+    private final WeakReference<Context> ctx;
+    private ProgressDialog progressDialog;
+
+    int downloadedBytes = 0;
+    int totalBytes = 0;
+
+    public DownloadImageTask(Context ctx, ImageView imageView) {
+        this.imageViewRef = new WeakReference<>(imageView);
+        this.ctx = new WeakReference<>(ctx);
+    }
+
+    // TODO 01. We modify the progress dialog to trigger AsyncTask's cancel method when the
+    //  dialog itself is cancelled
+
+    @Override
+    protected void onPreExecute() {
+        if ( ctx != null && ctx.get()!= null ) {
+            progressDialog = new ProgressDialog(ctx.get());
+            progressDialog.setTitle(R.string.downloading_image);
+            progressDialog.setProgressStyle(ProgressDialog.STYLE_HORIZONTAL);
+            progressDialog.setProgress(0);
+            progressDialog.setMax(100);
+            progressDialog.setIndeterminate(false);
+            // TODO 01.01. Now the dialog is cancellable
+            progressDialog.setCancelable(false);
+            // TODO 01.02. We set a listener to detect cancellation events and trigger the cancellation of the AsyncTask
+            // The boolean parameter allows us to specify whether an AsyncTask thread is in a
+            // 'interruptible' state, may actually be interrupted or not.
+            progressDialog.show();
+        }
+    }
+
+    @Override
+    protected void onProgressUpdate(Integer... values) {
+        progressDialog.setProgress(values[0]);
+    }
+
+    // TODO 02. We need to check for the cancellation in doInBackground
+    // Retrieves the image from a URL
+    private Bitmap downloadBitmap(URL url) {
+        Bitmap bitmap =null;
+        InputStream is = null;
+        try {
+            if (isCancelled()) {
+                return null;
+            }
+            HttpURLConnection conn = (HttpURLConnection) url.openConnection();
+            conn.setReadTimeout(10000 /* milliseconds */);
+            conn.setConnectTimeout(15000 /* milliseconds */);
+            conn.setRequestMethod("GET");
+            conn.setDoInput(true);
+            // Starts the query
+            conn.connect();
+            int responseCode = conn.getResponseCode();
+            if (responseCode != HttpURLConnection.HTTP_OK){
+                throw new Exception("Unsuccessful Result code");
+            }
+
+            totalBytes = conn.getContentLength();
+            downloadedBytes = 0;
+
+            is = conn.getInputStream();
+            BufferedInputStream bif = new BufferedInputStream(is) {
+
+                int progress = 0;
+
+                public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
+                    int readBytes = super.read(buffer, byteOffset, byteCount);
+
+                    // TODO 02.01. Verify if the download was cancelled and return -1.
+                    if (readBytes > 0) {
+                        downloadedBytes += readBytes;
+                        // int percent = (int) ((((float) downloadedBytes) / ((float) totalBytes)) * 100);
+                        int percent = (int) ((downloadedBytes * 100f) / totalBytes);
+                        if (percent > progress) {
+                            publishProgress(percent);
+                            progress = percent;
+                        }
+                    }
+                    return readBytes;
+                }
+            };
+            Bitmap downloaded = BitmapFactory.decodeStream(bif);
+            // TODO 02.02. We have to make sure that we only create the Bitmap if the operation
+            //  wasn't cancelled. Otherwise it will be null
+            bitmap = downloaded;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (is != null) {
+                try {
+                    is.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+            }
+        }
+        return bitmap;
+    }
+
+    // TODO 03. We override the onCancelled callback method.
+    //  This method is called instead of the onPostExecute callback, when the background task is finished because it has been cancelled.
+
+    // TODO 03.01. We show a default image in the image view of our layout
+    // TODO 03.02. Load the Bitmap from the application resources
+    // TODO 03.03. Set the image bitmap on the image view
+    // TODO 03.04. Remove the dialog from the screen
+
+    @Override
+    protected Bitmap doInBackground(URL... urls) {
+        URL url = urls[0];
+        // The IO operation invoked will take a significant ammount
+        // to complete
+        return downloadBitmap(url);
+    }
+
+    @Override
+    protected void onPostExecute(Bitmap bitmap) {
+        if ( progressDialog != null ) { progressDialog.dismiss(); }
+        ImageView imageView = this.imageViewRef.get();
+        if (imageView != null) {
+            imageView.setImageBitmap(bitmap);
+        }
+    }
+}
