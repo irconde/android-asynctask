@@ -71,9 +71,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
         Bitmap bitmap =null;
         InputStream is = null;
         try {
-            if (isCancelled()) {
-                return null;
-            }
             HttpURLConnection conn = (HttpURLConnection) url.openConnection();
             conn.setReadTimeout(10000 /* milliseconds */);
             conn.setConnectTimeout(15000 /* milliseconds */);
@@ -98,11 +95,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
 
                 public int read(byte[] buffer, int byteOffset, int byteCount) throws IOException {
                     int readBytes = super.read(buffer, byteOffset, byteCount);
-                    if ( isCancelled() ){
-                        // Returning -1 means that there is no more data because the
-                        // end of the stream has been reached.
-                        return -1;
-                    }
                     if (readBytes > 0) {
                         // TODO 09. Update actual number of bytes read from the file
                         downloadedBytes += readBytes;
@@ -119,9 +111,7 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
                 }
             };
             Bitmap downloaded = BitmapFactory.decodeStream(bif);
-            if ( !isCancelled() ){
-                bitmap = downloaded;
-            }
+            bitmap = downloaded;
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
