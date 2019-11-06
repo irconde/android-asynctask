@@ -19,6 +19,7 @@ import java.net.URL;
 /**
  * Created by irconde on 2019-11-05.
  */
+// TODO 01. Create a retained headless Fragment, which wraps our AsyncTask
 // We have to specify the three type parameters that exposes the AsyncTask class
     // Params. Type of the value we pass to doInBackground. URL
     // Progress. Type of the value returned to the main thread while the background thread is running. Integer

@@ -16,12 +16,13 @@
         android:layout_margin="10dp"
         android:id="@+id/textView" />
 
-    <Button
+    <!-- TODO 20. Comment the button widget. We'll execute automatically the task when the activity is created -->
+    <!--Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Show my face"
         android:layout_margin="10dp"
-        android:id="@+id/showImageBut" />
+        android:id="@+id/showImageBut" /-->
     <ImageView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
