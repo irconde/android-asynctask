@@ -119,7 +119,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Result<Bitmap>> {
                 bitmap = downloaded;
             }
         } catch (Exception e) {
-            // TODO 08.02. Throw again the exception once it's caught
             throw e;
         } finally {
             if (is != null) {
@@ -141,7 +140,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Result<Bitmap>> {
         progressDialog.dismiss();
     }
 
-    // TODO 03. Modify the type of the return value of the doInBackground method
     @Override
     protected Result<Bitmap> doInBackground(URL... urls) {
         Result<Bitmap> result = new Result<>();
@@ -157,7 +155,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Result<Bitmap>> {
         return result;
     }
 
-    // TODO 04. In the onPostExecute method we check for the presence of an Exception in the Result object
     @Override
     protected void onPostExecute(Result<Bitmap> result) {
         super.onPostExecute(result);
@@ -174,7 +171,6 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Result<Bitmap>> {
 
     }
 
-    // TODO 06.01. Method definition
     private void loadDefaultImage(ImageView imageView) {
         Bitmap bitmap = BitmapFactory.decodeResource(ctx.get().getResources(), R.drawable.default_photo);
         imageView.setImageBitmap(bitmap);

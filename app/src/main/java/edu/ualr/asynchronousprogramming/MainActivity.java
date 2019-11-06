@@ -33,12 +33,9 @@ public class MainActivity extends AppCompatActivity {
             public void onClick(View v) {
                 try {
 
-                    // TODO 07. Let's try this safe implementation trying to download an image that does not exist
-                    /*
+
                     URL url = new URL("http://media.mydogspace.com.s3.amazonaws.com/wp-content" +
                             "/uploads/2013/08/puppy-500x350.jpg");
-                     */
-                    URL url = new URL("http://img.allw.mn/content/www/2009/03/notfound.jpg");
                     // ImageView element used to display the downloaded image
                     ImageView iv = findViewById(R.id.downloadedImage);
                     photoAsyncTask = new DownloadImageTask(MainActivity.this, iv).execute(url);
