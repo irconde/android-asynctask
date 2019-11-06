@@ -83,7 +83,7 @@ public class DownloadImageTask extends AsyncTask<URL, Integer, Bitmap> {
             conn.connect();
             int responseCode = conn.getResponseCode();
             if (responseCode != HttpURLConnection.HTTP_OK){
-                throw new Exception("Unsucesfull Result code");
+                throw new Exception("Unsuccessful Result code");
             }
 
             // TODO 06. We initialize progress information
