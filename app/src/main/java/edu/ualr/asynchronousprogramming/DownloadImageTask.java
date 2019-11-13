@@ -73,6 +73,6 @@ public class DownloadImageTask {
 
 
     // TODO 05. Override onPostExecute method to return the result of the operation executed by the
-    //  background thread to the main thread
+    //  background thread to the main thread. Update the src of the ImageView with the retrieved bitmap
 
 }
